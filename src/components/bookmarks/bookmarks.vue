@@ -2,20 +2,32 @@
   <div class="bookmarks">
     <h1 class="tip">持续更新...</h1>
     <div class="bookmarks-wrapper">
-      <ul class="left-wrapper">
-        <li class="top-item">
-          <a href="javascript:;" @click="updateList(-1, -1)" class="top-name" :class="{'active':(curTopIndex===-1 && curSubIndex===-1)}"><i class="icon icon-zh_strong"></i>综合推荐</a>
-        </li>
-        <li class="top-item" v-for="(bookmark, topindex) in bookmarks" :key="topindex">
-          <a href="javascript:;" @click="updateList(bookmark.type, -1)" class="top-name" :class="{'active':(curTopIndex===topindex && curSubIndex===-1)}"><i class="icon" :class="bookmark.icon"></i>{{bookmark.name}}</a>
-          <ul class="sub-list" v-if="bookmark.sublist || bookmark.sublist.length>0">
-            <li class="sub-item" v-for="(sub, subindex) in bookmark.sublist" :key="subindex">
-              <a href="javascript:;" @click="updateList(bookmark.type, sub.type)" class="sub-name" :class="{'active':(topindex===curTopIndex && subindex===curSubIndex)}">{{sub.name}}</a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-      <div class="content-wrapper">
+      <div class="left-wrapper">
+        <button @click="toggleNav" href="javascript:;" class="nav-btn" :class="{'open':isNavShow}">
+          <span class="icon-nav"></span>
+          <span class="icon-nav"></span>
+          <span class="icon-nav"></span>
+        </button>
+        <div class="left-nav" :class="{'show':isNavShow}">
+          <div class="nav-wrapper" ref="navWrapper">
+            <ul>
+              <li class="top-item">
+                <a href="javascript:;" @click="updateList(-1, -1)" class="top-name" :class="{'active':(curTopIndex===-1 && curSubIndex===-1)}"><i class="icon icon-zh_strong"></i>综合推荐</a>
+              </li>
+              <li class="top-item" v-for="(bookmark, topindex) in bookmarks" :key="topindex">
+                <a href="javascript:;" @click="updateList(bookmark.type, -1)" class="top-name" :class="{'active':(curTopIndex===topindex && curSubIndex===-1)}"><i class="icon" :class="bookmark.icon"></i>{{bookmark.name}}</a>
+                <ul class="sub-list" v-if="bookmark.sublist || bookmark.sublist.length>0">
+                  <li class="sub-item" v-for="(sub, subindex) in bookmark.sublist" :key="subindex">
+                    <a href="javascript:;" @click="updateList(bookmark.type, sub.type)" class="sub-name" :class="{'active':(topindex===curTopIndex && subindex===curSubIndex)}">{{sub.name}}</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div @click="_closeNav" class="nav-bg" :class="{'show':isNavShow}"></div>
+      </div>
+      <div class="content-wrapper clearfix">
         <a class="content-item" v-for="(item, index) in curList" :key="index" :href="item.url" target="_blank">
           <div class="top-wrapper">
             <span class="pic"><img width="40" height="40" :src="item.pic && item.pic !== ''?item.pic:defaultPic" onerror="this.onerror='';src='./static/imgs/default.png'"></span>
@@ -32,12 +44,14 @@
 </template>
 
 <script type="text/ecmascript-6">
+  import BScroll from 'better-scroll'
   export default {
     data() {
       return {
         curTopIndex: -1,
         curSubIndex: -1,
         defaultPic: './static/imgs/default.png',
+        isNavShow: false,
         bookmarks: [
           {
             name: '前端相关',
@@ -370,9 +384,24 @@
       }
     },
     methods: {
+      _initScroll() {
+        this.navScroll = new BScroll(this.$refs.navWrapper, {
+          click: true
+        })
+      },
+      _closeNav() {
+        this.isNavShow = false
+      },
       updateList(toptype, subtype) {
         this.curTopIndex = toptype
         this.curSubIndex = subtype
+        this._closeNav()
+      },
+      toggleNav() {
+        this.isNavShow = !this.isNavShow
+        if (this.isNavShow) {
+          this._initScroll()
+        }
       }
     }
   }
@@ -384,7 +413,6 @@ body
   .bookmarks
     position: relative
     padding-top: 50px
-    width: 100%
     .tip
       position: absolute
       top:0
@@ -409,49 +437,129 @@ body
         top:0
         width: 120px
         border-right: 1px solid rgba(7, 17, 27, 0.1)
-        .top-item
-          margin-bottom: 10px
-          .top-name
-            display: block
-            height: 16px
-            line-height: 16px
-            padding: 4px 0
-            margin-bottom: 4px
-            font-size: 16px
-            &.active
-              color: #0085a1
-              font-weight: 700
-            .icon
-              display: inline-block
-              vertical-align: top
-              margin-right: 5px
+        transition: all 0.2s
+        .nav-btn
+          display: none
+        .left-nav
+          display: block
+          .top-item
+            margin-bottom: 10px
+            .top-name
+              display: block
               height: 16px
               line-height: 16px
-          .sub-list
-            padding-left: 30px
-            .sub-item
-              font-size: 0
-              .sub-name
-                display: block
-                height: 14px
-                line-height: 14px
-                padding: 6px 0
-                font-size: 14px
-                &.active
-                  color: #0085a1
-                  font-weight: 700
+              margin-bottom: 12px
+              font-size: 16px
+              white-space: nowrap
+              overflow: hidden
+              text-overflow: ellipsis
+              &.active
+                color: #0085a1
+                font-weight: 700
+              .icon
+                display: inline-block
+                vertical-align: top
+                margin-right: 5px
+                height: 16px
+                line-height: 16px
+            .sub-list
+              padding-left: 30px
+              .sub-item
+                font-size: 0
+                .sub-name
+                  display: block
+                  height: 14px
+                  line-height: 14px
+                  margin-bottom: 12px
+                  font-size: 14px
+                  white-space: nowrap
+                  overflow: hidden
+                  text-overflow: ellipsis
+                  &.active
+                    color: #0085a1
+                    font-weight: 700
+        .nav-bg
+          display: none
       @media screen and (max-width: 630px)
         .left-wrapper
-          display: none
+          z-index: auto
+          margin-left: -10%
+          margin-top:-40px
+          width: 40px
+          height: 40px
+          border: none
+          .nav-btn
+            position: relative
+            z-index: 2100
+            display: block
+            width: 40px
+            height: 40px
+            padding: 11px
+            border: none
+            border-radius: 50%
+            background: none
+            outline: none
+            cursor: pointer
+            transition: all 0.2s
+            &:focus
+              outline: none
+            .icon-nav
+              display: block
+              width: 18px
+              height: 2px
+              margin-top: 3px
+              background: #333
+              &:first-child
+                margin-top: 0
+            &.open
+              background: #fff
+          .left-nav
+            position: fixed
+            z-index: 2100
+            top: 50%
+            left: 60px
+            padding: 20px
+            width: 50%
+            height: 80%
+            box-sizing: content-box
+            background: #fff
+            border-radius: 5px
+            box-shadow: 3px 4.33px 5px 0px rgba( 7, 17, 27, 0.1 )
+            overflow: hidden
+            transition: all 0.4s
+            transform: translate3d(0, -170%, 0)
+            opacity: 0
+            &.show
+              transform: translate3d(0, -50%, 0)
+              opacity: 1
+            .nav-wrapper
+              height: 100%
+          .nav-bg
+            position: fixed
+            display: block
+            left: 0
+            top: 0
+            z-index: -1
+            width: 100%
+            height: 100%
+            opacity: 0
+            transition: all 0.4s
+            &.show
+              opacity: 1
+              z-index: 2000
+              background: rgba(7, 17, 27, 0.3)
+              backdrop-filter: blur(10px)
       .content-wrapper
         position: relative
         width: 100%
         box-sizing: border-box
         padding-left: 160px
+        font-size: 0
         .content-item
+          float:left
           width: 30%
-          min-width:110px;
-          margin: 6px 1.5%
+          min-width:110px
+          margin: 0 1.5% 12px 1.5%
           height: 110px
           display: inline-block
           box-sizing: border-box
@@ -476,14 +584,15 @@ body
               border-radius: 50%
             .title
               display: block
-              padding-left: 50px
+              padding-top: 1px
+              margin-left: 50px
               font-size: 0
               .name
                 display: block
                 width:100%
                 height: 14px
                 line-height: 14px
-                padding-top: 9px
+                margin-top: 8px
                 overflow: hidden
                 text-overflow: ellipsis
                 white-space: nowrap
@@ -507,17 +616,18 @@ body
             line-height: 16px
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
-            padding: 10px 0 0 5px
+            margin-top: 10px
+            padding-left: 5px
             font-size: 12px
             color: #8c8d8f
         @media screen and (max-width: 880px)
           .content-item
             width: 48%
-            margin: 6px 1%
+            margin: 0 1% 12px 1%
         @media screen and (max-width: 400px)
           .content-item
             width: 100%
-            margin: 6px 0
+            margin: 0 0 12px 0
       @media screen and (max-width: 630px)
         .content-wrapper
           padding-left: 0
