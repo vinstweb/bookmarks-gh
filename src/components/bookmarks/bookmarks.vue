@@ -4,13 +4,13 @@
     <div class="bookmarks-wrapper">
       <ul class="left-wrapper">
         <li class="top-item">
-          <a href="javascript:;" @click="updateList(-1, -1)" class="top-name"><i class="icon icon-zh_strong"></i>综合推荐</a>
+          <a href="javascript:;" @click="updateList(-1, -1)" class="top-name" :class="{'active':(curTopIndex===-1 && curSubIndex===-1)}"><i class="icon icon-zh_strong"></i>综合推荐</a>
         </li>
-        <li class="top-item" v-for="(bookmark, index) in bookmarks" :key="index">
-          <a href="javascript:;" @click="updateList(bookmark.type, -1)" class="top-name"><i class="icon" :class="bookmark.icon"></i>{{bookmark.name}}</a>
+        <li class="top-item" v-for="(bookmark, topindex) in bookmarks" :key="topindex">
+          <a href="javascript:;" @click="updateList(bookmark.type, -1)" class="top-name" :class="{'active':(curTopIndex===topindex && curSubIndex===-1)}"><i class="icon" :class="bookmark.icon"></i>{{bookmark.name}}</a>
           <ul class="sub-list" v-if="bookmark.sublist || bookmark.sublist.length>0">
-            <li class="sub-item" v-for="(sub, index) in bookmark.sublist" :key="index">
-              <a href="javascript:;" @click="updateList(bookmark.type, sub.type)" class="sub-name">{{sub.name}}</a>
+            <li class="sub-item" v-for="(sub, subindex) in bookmark.sublist" :key="subindex">
+              <a href="javascript:;" @click="updateList(bookmark.type, sub.type)" class="sub-name" :class="{'active':(topindex===curTopIndex && subindex===curSubIndex)}">{{sub.name}}</a>
             </li>
           </ul>
         </li>
@@ -152,7 +152,7 @@
                   },
                   {
                     name: '廖学锋的官方网站',
-                    pic: './static/imgs/liaoxuefeng.png',
+                    pic: '',
                     description: '小白学习 JavaScript、Python、Git 的好去处。',
                     url: 'https://www.liaoxuefeng.com/'
                   },
@@ -218,7 +218,7 @@
                 items: [
                   {
                     name: '前端面试题集锦',
-                    'pic': '',
+                    'pic': './static/imgs/github.png',
                     description: '前端笔试题、面试题集锦，作者持续更新。',
                     url: 'https://fe.padding.me/#/questions/'
                   }
@@ -418,6 +418,9 @@ body
             padding: 4px 0
             margin-bottom: 4px
             font-size: 16px
+            &.active
+              color: #0085a1
+              font-weight: 700
             .icon
               display: inline-block
               vertical-align: top
@@ -434,6 +437,9 @@ body
                 line-height: 14px
                 padding: 6px 0
                 font-size: 14px
+                &.active
+                  color: #0085a1
+                  font-weight: 700
       @media screen and (max-width: 630px)
         .left-wrapper
           display: none
