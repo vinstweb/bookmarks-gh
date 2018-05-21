@@ -186,13 +186,13 @@
                     name: 'Stack Overflow',
                     pic: './static/imgs/stackoverflow.png',
                     description: '有问题？去 Stack Overflow，全球最优的程序员社区之一。',
-                    url: 'https://segmentfault.com/'
+                    url: 'https://stackoverflow.com/'
                   },
                   {
                     name: 'SegmentFault',
                     pic: './static/imgs/segmentfault.png',
                     description: '中国版的Stack Overflow',
-                    url: 'https://stackoverflow.com/'
+                    url: 'https://segmentfault.com/'
                   },
                   {
                     name: '掘金',
